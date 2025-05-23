@@ -14,8 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Band> bands = [
-  ];
+  List<Band> bands = [];
 
   @override
   void initState() {
@@ -77,8 +76,9 @@ class _HomePageState extends State<HomePage> {
     return Dismissible(
       key: Key(band.id),
       direction: DismissDirection.startToEnd,
-      onDismissed: (direction) {
-        // todo: llamar el borrado en el server
+      onDismissed: (_) {
+        final socketService = Provider.of<SocketService>(context, listen: false);
+        socketService.socket.emit('delete-band', {'id': band.id});
       },
       background: Container(
         padding: EdgeInsets.only(left: 10.0),
@@ -149,9 +149,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void addBandToList(String name) {
+
+    final socketService = Provider.of<SocketService>(context, listen: false);
+
     if (name.length > 1) {
-      bands.add(Band(id: DateTime.now().toString(), name: name, votes: 0));
-      setState(() {});
+      socketService.socket.emit('add-band', {'name': name});
     }
 
     Navigator.pop(context);
